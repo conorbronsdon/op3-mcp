@@ -1,0 +1,52 @@
+{
+  "name": "@conorbronsdon/op3-mcp",
+  "version": "0.1.0",
+  "description": "MCP server for OP3 (Open Podcast Prefix Project) — podcast analytics for AI agents: downloads, geography, apps, and episode breakdowns.",
+  "type": "module",
+  "bin": {
+    "op3-mcp": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "lint": "tsc --noEmit",
+    "test": "vitest run",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.7.0",
+    "vitest": "^4.1.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "mcp",
+    "op3",
+    "podcast",
+    "analytics",
+    "downloads",
+    "ai",
+    "claude"
+  ],
+  "license": "MIT",
+  "author": "Conor Bronsdon",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/conorbronsdon/op3-mcp.git"
+  },
+  "homepage": "https://github.com/conorbronsdon/op3-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/conorbronsdon/op3-mcp/issues"
+  },
+  "mcpName": "io.github.conorbronsdon/op3-mcp"
+}
