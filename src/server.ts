@@ -63,7 +63,14 @@ export function createServer(client: OP3Client): McpServer {
     },
     async ({ show_uuid }) => {
       const data = await client.getShowDownloadCounts(show_uuid);
-      const entry = data.showDownloadCounts?.[show_uuid];
+      const counts = data.showDownloadCounts || {};
+      // OP3 keys the result by the canonical (lowercase) show UUID. A direct
+      // lookup on the caller's string misses if the case differs, so fall back
+      // to the only entry in the map (these queries return one show).
+      const entry =
+        counts[show_uuid] ??
+        counts[show_uuid.toLowerCase()] ??
+        Object.values(counts)[0];
       if (!entry) {
         return json({
           showUuid: show_uuid,
@@ -73,10 +80,11 @@ export function createServer(client: OP3Client): McpServer {
       return json({
         showUuid: show_uuid,
         asof: data.asof,
-        days: entry.days,
         monthlyDownloads: entry.monthlyDownloads,
         weeklyAvgDownloads: entry.weeklyAvgDownloads,
         numWeeks: entry.numWeeks,
+        // Most recent week last. (OP3's `days` bitmask is omitted — it is an
+        // opaque per-day completeness flag, not useful to an agent.)
         weeklyDownloads: entry.weeklyDownloads,
       });
     },
@@ -153,7 +161,7 @@ export function createServer(client: OP3Client): McpServer {
 
   server.tool(
     "op3_top_countries",
-    "Get the top listener countries (or regions) for a show. NOTE: OP3 has no native geography query, so this counts raw download records over a recent window and aggregates by country. It is a sample, not an exact lifetime total. Each result has a download count and percent share. Needs a show UUID. Keep max_records modest to stay fast and within rate limits.",
+    "Get the top listener countries (or regions) for a show. NOTE: OP3 has no native geography query, so this counts raw download records and aggregates by country client-side. It is a representative sample, not an exact lifetime total. OP3 returns raw records oldest-first, so to keep the sample recent this tool defaults to the last `window_days` days (90) when you do not pass an explicit start. Each result has a download count and percent share. Needs a show UUID. Keep max_records modest to stay fast and within rate limits.",
     {
       show_uuid: z.string().describe("OP3 show UUID (32 hex chars)."),
       by: z
@@ -164,11 +172,16 @@ export function createServer(client: OP3Client): McpServer {
       start: z
         .string()
         .optional()
-        .describe("Start of the window, ISO date or datetime (e.g. 2026-05-01). Defaults to OP3's recent window."),
+        .describe("Start of the window, ISO date or datetime (e.g. 2026-05-01). If omitted, defaults to window_days ago. OP3 records are oldest-first, so without a start the sample would otherwise be the show's oldest records, not recent ones."),
       end: z
         .string()
         .optional()
-        .describe("End of the window, ISO date or datetime."),
+        .describe("End of the window, ISO date or datetime. Defaults to now."),
+      window_days: z
+        .number()
+        .optional()
+        .default(90)
+        .describe("When start is omitted, sample this many days back from now (default 90). Ignored if start is set."),
       limit: z
         .number()
         .optional()
@@ -178,13 +191,22 @@ export function createServer(client: OP3Client): McpServer {
         .number()
         .optional()
         .default(5000)
-        .describe("How many recent download records to sample for the aggregation (default 5000, cap 20000). Higher is more accurate but slower."),
+        .describe("How many download records to sample for the aggregation (default 5000, cap 20000). Higher is more accurate but slower."),
     },
-    async ({ show_uuid, by, start, end, limit, max_records }) => {
-      const cap = Math.min(Math.max(100, max_records), 20000);
+    async ({ show_uuid, by, start, end, window_days, limit, max_records }) => {
+      const cap = Math.min(Math.max(100, max_records ?? 5000), 20000);
+      // OP3 returns records ascending by time. Without a start, a sample would
+      // be the show's *oldest* downloads, which misrepresents current geography.
+      // Default to a recent window so "top countries" means recent listeners.
+      const windowDays = Math.max(1, window_days ?? 90);
+      const effectiveStart =
+        start ||
+        new Date(Date.now() - windowDays * 86400000)
+          .toISOString()
+          .slice(0, 10);
       const records = await client.collectDownloadRecords({
         showUuid: show_uuid,
-        start,
+        start: effectiveStart,
         end,
         cap,
       });
@@ -193,10 +215,11 @@ export function createServer(client: OP3Client): McpServer {
       return json({
         showUuid: show_uuid,
         aggregatedBy: by,
-        note: "Computed from a sample of raw OP3 download records, not an exact total.",
+        note: "Computed from a sample of raw OP3 download records, not an exact total. Records are sampled oldest-first within the window below.",
         recordsSampled: records.length,
         recordsWithGeo: counted,
-        window: { start: start || "OP3 default", end: end || "now" },
+        sampleHitCap: records.length >= cap,
+        window: { start: effectiveStart, end: end || "now" },
         results: ranked,
       });
     },

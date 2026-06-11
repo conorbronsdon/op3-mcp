@@ -15,15 +15,14 @@ export interface ShowInfoResponse {
   episodes?: ShowEpisode[];
 }
 
-export interface WeeklyDownloads {
-  weekStartTime: string;
-  downloads: number;
-}
-
 export interface ShowDownloadCount {
-  days?: number;
+  // OP3 returns `days` as a bitmask string of completed days (e.g. "11111..."),
+  // not a number.
+  days?: string;
   monthlyDownloads?: number;
-  weeklyDownloads?: WeeklyDownloads[];
+  // OP3 returns weekly downloads as a plain array of numbers, most recent week
+  // last. There are no per-week start-time objects.
+  weeklyDownloads?: number[];
   weeklyAvgDownloads?: number;
   numWeeks?: number;
 }
