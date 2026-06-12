@@ -1,8 +1,25 @@
+<div align="center">
+
 # op3-mcp
+
+Podcast analytics for AI agents through OP3: downloads over time, listener geography, apps, and per-episode breakdowns. Read-only.
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
+[![npm version](https://img.shields.io/npm/v/@conorbronsdon/op3-mcp?style=flat-square)](https://www.npmjs.com/package/@conorbronsdon/op3-mcp)
+[![Node](https://img.shields.io/badge/Node-18+-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Podcast](https://img.shields.io/badge/Podcast-Chain_of_Thought-purple?style=flat-square)](https://chainofthought.show)
+[![X](https://img.shields.io/badge/X-@ConorBronsdon-black?style=flat-square&logo=x)](https://x.com/ConorBronsdon)
+
+</div>
+
+---
+
 
 An MCP server for [OP3](https://op3.dev), the Open Podcast Prefix Project. It gives AI assistants podcast analytics that most hosting APIs do not expose: downloads over time, listener geography, the apps people listen in, and per-episode breakdowns.
 
 **Read-only by design.** OP3 is an analytics service. This server only reads data. It cannot change anything, so it is safe to give an agent.
+
+**Why this exists.** Most podcast hosts expose almost nothing through their API. Transistor's API, for example, returns download counts and not much else: no geography, no app share, no per-episode recency curve. OP3 has all of that, because it logs each download at the redirect. This server puts that data in front of an agent.
 
 ## What is OP3?
 
@@ -115,6 +132,30 @@ OP3_API_TOKEN=your-token npm start
 ```
 
 Tests mock `fetch` and make no network calls.
+
+## Contributing
+
+Issues and pull requests are welcome. If an OP3 endpoint changes shape, or there is an aggregate query worth wrapping as a tool, open an issue describing what you want and the OP3 endpoint it maps to. Keep the read-only contract: this server reports analytics, it does not change anything.
+
+## About
+
+Built and maintained by [Conor Bronsdon](https://github.com/conorbronsdon). I host the [Chain of Thought](https://chainofthought.show) podcast, which covers AI infrastructure, developer tools, and how practitioners actually use this stuff. I built this to pull honest listener analytics into the agent workflows that run the show.
+
+Companion tools:
+
+- [podcast-benchmark](https://github.com/conorbronsdon/podcast-benchmark): benchmark your show against peers on public signals. The public-data complement to your own private OP3 analytics here.
+- [Transistor-MCP](https://github.com/conorbronsdon/Transistor-MCP): the Transistor.fm MCP server. Episodes, transcripts, and the download counts that OP3 fills out with geography and apps.
+- [substack-mcp](https://github.com/conorbronsdon/substack-mcp): read posts and manage drafts on Substack, safe for agent workflows.
+- [podcastindex-mcp](https://github.com/conorbronsdon/podcastindex-mcp): the Podcast Index MCP server, search by person or topic, trending shows, feed health.
+- [ai-tools-for-creators](https://github.com/conorbronsdon/ai-tools-for-creators): a curated list of AI skills and MCP servers for people who ship ideas for a living.
+
+More at [chainofthought.show](https://chainofthought.show) and on [X](https://x.com/ConorBronsdon).
+
+---
+
+## Disclaimer
+
+*All views, opinions, and statements expressed on this account are solely my own and are made in my personal capacity. They do not reflect, and should not be construed as reflecting, the views, positions, or policies of Modular. This account is not affiliated with, authorized by, or endorsed by Modular in any way.*
 
 ## License
 
