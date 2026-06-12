@@ -10,6 +10,8 @@ Podcast analytics for AI agents through OP3: downloads over time, listener geogr
 [![Podcast](https://img.shields.io/badge/Podcast-Chain_of_Thought-purple?style=flat-square)](https://chainofthought.show)
 [![X](https://img.shields.io/badge/X-@ConorBronsdon-black?style=flat-square&logo=x)](https://x.com/ConorBronsdon)
 
+<img src="docs/demo.gif" alt="Demo: an agent calls the op3_show_downloads tool and gets monthly and weekly download counts back (sample data)" width="800">
+
 </div>
 
 ---
