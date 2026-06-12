@@ -2,7 +2,7 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.conorbronsdon/op3-mcp",
   "title": "OP3 MCP Server",
-  "description": "MCP server for OP3 (Open Podcast Prefix Project) — read-only podcast analytics for AI agents: downloads over time, listener geography, listening apps, and per-episode breakdowns. Requires a podcast already routed through the OP3 prefix.",
+  "description": "OP3 podcast analytics: downloads, geography, app share, episode breakdowns. Read-only.",
   "repository": {
     "url": "https://github.com/conorbronsdon/op3-mcp",
     "source": "github"
