@@ -1,0 +1,29 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.conorbronsdon/op3-mcp",
+  "title": "OP3 MCP Server",
+  "description": "MCP server for OP3 (Open Podcast Prefix Project) — read-only podcast analytics for AI agents: downloads over time, listener geography, listening apps, and per-episode breakdowns. Requires a podcast already routed through the OP3 prefix.",
+  "repository": {
+    "url": "https://github.com/conorbronsdon/op3-mcp",
+    "source": "github"
+  },
+  "version": "0.1.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "@conorbronsdon/op3-mcp",
+      "version": "0.1.0",
+      "runtimeHint": "npx",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "OP3_API_TOKEN",
+          "description": "OP3 API token — sign in at https://op3.dev and open your API token page",
+          "isRequired": true
+        }
+      ]
+    }
+  ]
+}
