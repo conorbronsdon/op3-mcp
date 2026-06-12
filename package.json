@@ -4,7 +4,7 @@
   "description": "MCP server for OP3 (Open Podcast Prefix Project) — podcast analytics for AI agents: downloads, geography, apps, and episode breakdowns.",
   "type": "module",
   "bin": {
-    "op3-mcp": "./dist/index.js"
+    "op3-mcp": "dist/index.js"
   },
   "files": [
     "dist"
@@ -46,7 +46,7 @@
   "author": "Conor Bronsdon",
   "repository": {
     "type": "git",
-    "url": "https://github.com/conorbronsdon/op3-mcp.git"
+    "url": "git+https://github.com/conorbronsdon/op3-mcp.git"
   },
   "homepage": "https://github.com/conorbronsdon/op3-mcp#readme",
   "bugs": {
