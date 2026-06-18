@@ -23,6 +23,10 @@ An MCP server for [OP3](https://op3.dev), the Open Podcast Prefix Project. It gi
 
 **Why this exists.** Most podcast hosts expose almost nothing through their API. Transistor's API, for example, returns download counts and not much else: no geography, no app share, no per-episode recency curve. OP3 has all of that, because it logs each download at the redirect. This server puts that data in front of an agent.
 
+<a href="https://glama.ai/mcp/servers/conorbronsdon/op3-mcp">
+  <img width="380" height="200" src="https://glama.ai/mcp/servers/conorbronsdon/op3-mcp/badge" alt="op3-mcp MCP server" />
+</a>
+
 ## What is OP3?
 
 OP3 is a free, open analytics prefix for podcasts. You add `https://op3.dev/e/` in front of your enclosure URLs, and OP3 logs each download before redirecting to your real audio file. It then reports downloads, geography, and app share. Stats pages are public; the API needs a token. See https://op3.dev for details.
