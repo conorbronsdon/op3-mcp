@@ -1,6 +1,6 @@
 {
   "name": "@conorbronsdon/op3-mcp",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "MCP server for OP3 (Open Podcast Prefix Project) — podcast analytics for AI agents: downloads, geography, apps, and episode breakdowns.",
   "type": "module",
   "bin": {
