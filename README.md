@@ -121,6 +121,19 @@ Read these so you know what the numbers mean.
 - **Bots are excluded by default** in OP3's download queries, which is usually what you want.
 - **Rate limits are not publicly documented.** Keep `limit` and `max_records` modest. The server surfaces a clear error on HTTP 429.
 
+### Typed errors
+
+API failures are mapped to a typed error hierarchy (`OP3APIError` base, with `AuthError`, `RateLimitError`, `NotFoundError`, `ValidationError`, and `ServerError` subclasses keyed off HTTP status) in `src/errors.ts`:
+
+- `AuthError` (401/403) — the OP3 token is missing or invalid.
+- `RateLimitError` (429) — too many requests against the OP3 API.
+- `NotFoundError` (404) — the show, feed, or resource doesn't exist (or isn't on OP3 yet).
+- `ValidationError` (400) — a malformed or invalid request parameter.
+- `ServerError` (5xx) — a failure on OP3's side; the specific status (500, 502, 503, ...) is preserved in the message.
+- `OP3APIError` — the base class, used as a fallback for unmapped status codes or network failures.
+
+Every tool call still returns the same `isError: true` response shape on failure — the typed hierarchy just makes the message specific to what went wrong instead of a single generic "API error" string.
+
 ## Development
 
 ```bash

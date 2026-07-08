@@ -1,8 +1,7 @@
 import {
-  AuthError,
-  NotFoundError,
+  extractErrorDetail,
+  mapHttpStatusToError,
   OP3APIError,
-  RateLimitError,
 } from "./errors.js";
 import type {
   DownloadRecord,
@@ -14,7 +13,7 @@ import type {
 } from "./types.js";
 
 const BASE_URL = "https://op3.dev/api/1";
-const VERSION = "0.1.0";
+const VERSION = "0.2.0";
 
 /**
  * Client for the OP3 API (op3.dev). All endpoints here are read-only and map
@@ -63,18 +62,11 @@ export class OP3Client {
       );
     }
 
-    if (response.status === 401 || response.status === 403) {
-      throw new AuthError(endpoint);
-    }
-    if (response.status === 429) {
-      throw new RateLimitError(endpoint);
-    }
-    if (response.status === 404) {
-      throw new NotFoundError(endpoint, params.showUuid ? String(params.showUuid) : endpoint);
-    }
     if (!response.ok) {
-      const body = await response.text().catch(() => "unknown error");
-      throw new OP3APIError(response.status, body.slice(0, 500), endpoint);
+      const bodyText = await response.text().catch(() => "");
+      const identifier = params.showUuid ? String(params.showUuid) : endpoint;
+      const detail = extractErrorDetail(bodyText, "unknown error");
+      throw mapHttpStatusToError(response.status, detail, endpoint, identifier);
     }
 
     return (await response.json()) as T;

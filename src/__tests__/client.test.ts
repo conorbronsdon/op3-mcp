@@ -1,6 +1,12 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { OP3Client } from "../client.js";
-import { AuthError, NotFoundError, RateLimitError } from "../errors.js";
+import {
+  AuthError,
+  NotFoundError,
+  RateLimitError,
+  ValidationError,
+  ServerError,
+} from "../errors.js";
 
 function mockFetch(status: number, body: unknown) {
   return vi.fn(
@@ -54,6 +60,31 @@ describe("OP3Client.request", () => {
     await expect(client.getShow("missing")).rejects.toBeInstanceOf(
       NotFoundError,
     );
+  });
+
+  it("throws ValidationError on 400", async () => {
+    vi.stubGlobal("fetch", mockFetch(400, "missing show_uuid"));
+    const client = new OP3Client("tok");
+    const err = await client.getTopAppsForShow("x").catch((e) => e);
+    expect(err).toBeInstanceOf(ValidationError);
+    expect(err.message).toContain("missing show_uuid");
+  });
+
+  it("throws ServerError on 500", async () => {
+    vi.stubGlobal("fetch", mockFetch(500, "internal error"));
+    const client = new OP3Client("tok");
+    const err = await client.getShowDownloadCounts("x").catch((e) => e);
+    expect(err).toBeInstanceOf(ServerError);
+    expect(err.statusCode).toBe(500);
+  });
+
+  it("throws ServerError on 502, preserving the specific status", async () => {
+    vi.stubGlobal("fetch", mockFetch(502, "bad gateway"));
+    const client = new OP3Client("tok");
+    const err = await client.getTopAppsForShow("x").catch((e) => e);
+    expect(err).toBeInstanceOf(ServerError);
+    expect(err.statusCode).toBe(502);
+    expect(err.message).toContain("bad gateway");
   });
 
   it("maps show-download-counts response", async () => {
