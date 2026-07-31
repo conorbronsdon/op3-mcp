@@ -7,7 +7,7 @@ Podcast analytics for AI agents through OP3: downloads over time, listener geogr
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
 [![npm version](https://img.shields.io/npm/v/@conorbronsdon/op3-mcp?style=flat-square)](https://www.npmjs.com/package/@conorbronsdon/op3-mcp)
 [![Node](https://img.shields.io/badge/Node-18+-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org/)
-[![Podcast](https://img.shields.io/badge/Podcast-Chain_of_Thought-purple?style=flat-square)](https://chainofthought.show)
+[![Podcast](https://img.shields.io/badge/Podcast-Chain_of_Thought-purple?style=flat-square)](https://chainofthought.show/?utm_source=github&utm_medium=referral&utm_campaign=repo-readme&utm_content=op3-mcp)
 [![X](https://img.shields.io/badge/X-@ConorBronsdon-black?style=flat-square&logo=x)](https://x.com/ConorBronsdon)
 
 <img src="docs/demo.gif" alt="Demo: an agent calls the op3_show_downloads tool and gets monthly and weekly download counts back (sample data)" width="800">
@@ -158,7 +158,7 @@ Issues and pull requests are welcome. If an OP3 endpoint changes shape, or there
 
 ## About
 
-Built and maintained by [Conor Bronsdon](https://github.com/conorbronsdon). I host the [Chain of Thought](https://chainofthought.show) podcast, which covers AI infrastructure, developer tools, and how practitioners actually use this stuff. I built this to pull honest listener analytics into the agent workflows that run the show.
+Built and maintained by [Conor Bronsdon](https://github.com/conorbronsdon). I host the [Chain of Thought](https://chainofthought.show/?utm_source=github&utm_medium=referral&utm_campaign=repo-readme&utm_content=op3-mcp) podcast, which covers AI infrastructure, developer tools, and how practitioners actually use this stuff. I built this to pull honest listener analytics into the agent workflows that run the show.
 
 Companion tools:
 
@@ -168,7 +168,7 @@ Companion tools:
 - [podcastindex-mcp](https://github.com/conorbronsdon/podcastindex-mcp): the Podcast Index MCP server, search by person or topic, trending shows, feed health.
 - [ai-tools-for-creators](https://github.com/conorbronsdon/ai-tools-for-creators): a curated list of AI skills and MCP servers for people who ship ideas for a living.
 
-More at [chainofthought.show](https://chainofthought.show) and on [X](https://x.com/ConorBronsdon).
+More at [chainofthought.show](https://chainofthought.show/?utm_source=github&utm_medium=referral&utm_campaign=repo-readme&utm_content=op3-mcp) and on [X](https://x.com/ConorBronsdon).
 
 ---
 
