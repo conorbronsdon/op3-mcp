@@ -163,7 +163,7 @@ Built and maintained by [Conor Bronsdon](https://github.com/conorbronsdon). I ho
 Companion tools:
 
 - [podcast-benchmark](https://github.com/conorbronsdon/podcast-benchmark): benchmark your show against peers on public signals. The public-data complement to your own private OP3 analytics here.
-- [Transistor-MCP](https://github.com/conorbronsdon/Transistor-MCP): the Transistor.fm MCP server. Episodes, transcripts, and the download counts that OP3 fills out with geography and apps.
+- [Transistor MCP](https://mcp.transistor.fm): Transistor.fm's official MCP server. Episodes, publishing, and analytics.
 - [substack-mcp](https://github.com/conorbronsdon/substack-mcp): read posts and manage drafts on Substack, safe for agent workflows.
 - [podcastindex-mcp](https://github.com/conorbronsdon/podcastindex-mcp): the Podcast Index MCP server, search by person or topic, trending shows, feed health.
 - [ai-tools-for-creators](https://github.com/conorbronsdon/ai-tools-for-creators): a curated list of AI skills and MCP servers for people who ship ideas for a living.
