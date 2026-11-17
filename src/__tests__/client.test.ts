@@ -23,19 +23,82 @@ afterEach(() => {
 });
 
 describe("OP3Client.request", () => {
-  it("sends the token as a query param and bearer header", async () => {
+  it("sends the token only as a bearer header, never in the URL", async () => {
     const fetchMock = mockFetch(200, { showUuid: "abc", title: "Test Show" });
     vi.stubGlobal("fetch", fetchMock);
 
-    const client = new OP3Client("tok123");
+    const client = new OP3Client("example-op3-token");
     const result = await client.getShow("abc");
 
     expect(result.title).toBe("Test Show");
     const [calledUrl, opts] = fetchMock.mock.calls[0] as [string, RequestInit];
-    expect(calledUrl).toContain("token=tok123");
+    expect(calledUrl).toBe("https://op3.dev/api/1/shows/abc");
+    expect(new URL(calledUrl).searchParams.has("token")).toBe(false);
+    expect(calledUrl).not.toContain("example-op3-token");
     expect((opts.headers as Record<string, string>).Authorization).toBe(
-      "Bearer tok123",
+      "Bearer example-op3-token",
     );
+  });
+
+  it("keeps the token out of the URL on every endpoint, including paged downloads", async () => {
+    const fetchMock = vi.fn(
+      async (_url: string, _init?: RequestInit): Promise<Response> =>
+        new Response(JSON.stringify({ rows: [], continuationToken: undefined }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const client = new OP3Client("example-op3-token");
+    await client.getShow("abc", true);
+    await client.getShowDownloadCounts("abc");
+    await client.getEpisodeDownloadCounts("abc");
+    await client.getTopAppsForShow("abc");
+    await client.getDownloads({ showUuid: "abc", limit: 5 });
+    await client.collectDownloadRecords({ showUuid: "abc", cap: 5 });
+
+    const urls = fetchMock.mock.calls.map((c) => c[0] as string);
+    expect(urls).toEqual([
+      "https://op3.dev/api/1/shows/abc?episodes=include",
+      "https://op3.dev/api/1/queries/show-download-counts?showUuid=abc",
+      "https://op3.dev/api/1/queries/episode-download-counts?showUuid=abc",
+      "https://op3.dev/api/1/queries/top-apps-for-show?showUuid=abc",
+      "https://op3.dev/api/1/downloads/show/abc?format=json&limit=5",
+      "https://op3.dev/api/1/downloads/show/abc?format=json&limit=5",
+    ]);
+    const auths = fetchMock.mock.calls.map(
+      (c) => ((c[1] as RequestInit).headers as Record<string, string>).Authorization,
+    );
+    expect(auths).toEqual(Array(6).fill("Bearer example-op3-token"));
+  });
+
+  it("does not leak the token into a network error message", async () => {
+    // A fetch failure whose message echoes the request URL, as some
+    // network stacks do. The token must not appear in what the tool returns.
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (url: string): Promise<Response> => {
+        throw new TypeError(`fetch failed for ${url}`);
+      }),
+    );
+    const client = new OP3Client("example-op3-token");
+    const err = await client.getShowDownloadCounts("x").catch((e) => e);
+    expect(err.message).toBe(
+      "OP3 API error (0) at /api/1/queries/show-download-counts: Network error reaching OP3: fetch failed for https://op3.dev/api/1/queries/show-download-counts?showUuid=x",
+    );
+    expect(err.message).not.toContain("example-op3-token");
+  });
+
+  it("sends no Authorization header and no token param when no token is set", async () => {
+    const fetchMock = mockFetch(200, { showUuid: "abc", title: "Test Show" });
+    vi.stubGlobal("fetch", fetchMock);
+
+    await new OP3Client("").getShow("abc");
+
+    const [calledUrl, opts] = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect(calledUrl).toBe("https://op3.dev/api/1/shows/abc");
+    expect((opts.headers as Record<string, string>).Authorization).toBeUndefined();
   });
 
   it("throws AuthError on 401", async () => {
