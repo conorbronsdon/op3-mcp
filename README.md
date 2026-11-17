@@ -46,7 +46,15 @@ If your feed does not use the OP3 prefix yet, OP3 has no data for it. See "Addin
 
 Most tools need a show UUID. Start with `op3_get_show` to turn a feed URL or podcast GUID into a UUID.
 
-Every list tool takes a `limit` and defaults it low (10) to keep responses small. Agents pay tokens per response.
+List tools cap their output and default the cap low to keep responses small. Agents pay tokens per response.
+
+| Tool | Cap parameter | Default | Max |
+|------|---------------|---------|-----|
+| `op3_get_show` | `episode_limit` (only with `include_episodes: true`) | 10 | none |
+| `op3_episode_downloads` | `limit` | 10 | none |
+| `op3_top_apps` | `limit` | 10 | none |
+| `op3_top_countries` | `limit` (results), `max_records` (records sampled) | 10, 5000 | none, 20000 |
+| `op3_downloads_timeseries` | `limit` | 20 | 200 |
 
 ## Setup
 
