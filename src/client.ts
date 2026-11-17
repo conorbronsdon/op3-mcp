@@ -16,6 +16,19 @@ const BASE_URL = "https://op3.dev/api/1";
 const VERSION = "0.2.0";
 
 /**
+ * Path segment for GET /shows/{id}. OP3 routes a feed URL only as urlsafe
+ * base64 matching `[0-9a-zA-Z_-]{15,}=*`, with the `=` padding literal in the
+ * path. Percent-encoding the padding to `%3D` (or sending standard base64's
+ * `+` and `/`) misses that route and OP3 answers 404. Standard base64 is
+ * mapped to the urlsafe alphabet; show UUIDs and podcast:guids contain none
+ * of `+`, `/` or `=`, so they pass through unchanged.
+ */
+export function showPathSegment(identifier: string): string {
+  const urlSafe = identifier.replace(/\+/g, "-").replace(/\//g, "_");
+  return encodeURIComponent(urlSafe).replace(/%3D/g, "=");
+}
+
+/**
  * Client for the OP3 API (op3.dev). All endpoints here are read-only and map
  * directly to documented OP3 routes — see https://op3.dev/api/docs.
  */
@@ -77,7 +90,7 @@ export class OP3Client {
     identifier: string,
     includeEpisodes = false,
   ): Promise<ShowInfoResponse> {
-    return this.request<ShowInfoResponse>(`/shows/${encodeURIComponent(identifier)}`, {
+    return this.request<ShowInfoResponse>(`/shows/${showPathSegment(identifier)}`, {
       episodes: includeEpisodes ? "include" : undefined,
     });
   }
