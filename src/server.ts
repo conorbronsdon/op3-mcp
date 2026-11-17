@@ -27,7 +27,7 @@ export function createServer(client: OP3Client): McpServer {
   const showIdArg = z
     .string()
     .describe(
-      "Show identifier: an OP3 show UUID (32 hex chars), a podcast:guid, or a base64-encoded feed URL. Use op3_get_show to resolve a feed to its UUID.",
+      "Show identifier: an OP3 show UUID (32 hex chars), a podcast:guid, or a base64-encoded feed URL (urlsafe or standard base64, padding allowed). Use op3_get_show to resolve a feed to its UUID.",
     );
 
   // --- Show lookup ---

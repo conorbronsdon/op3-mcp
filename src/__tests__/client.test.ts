@@ -153,3 +153,44 @@ describe("OP3Client.collectDownloadRecords", () => {
     expect(records).toHaveLength(2);
   });
 });
+
+describe("OP3Client.getShow feed-URL identifiers", () => {
+  // OP3's own route for GET /shows/{id} (skymethod/op3,
+  // worker/routes/api.ts): a feed URL only matches as urlsafe base64 with
+  // literal `=` padding. Anything else falls through to a 404.
+  const OP3_SHOWS_ROUTE =
+    /^\/api\/1\/shows\/([0-9a-f]{32}|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}|[0-9a-zA-Z_-]{15,}=*)$/;
+
+  async function calledPath(identifier: string): Promise<string> {
+    const fetchMock = mockFetch(200, { showUuid: "abc", title: "Test Show" });
+    vi.stubGlobal("fetch", fetchMock);
+    await new OP3Client("example-op3-token").getShow(identifier);
+    return new URL(fetchMock.mock.calls[0][0] as string).pathname;
+  }
+
+  it("keeps base64 padding literal so OP3's shows route matches", async () => {
+    // base64("https://example.com/feed.xml") — padded with "=="
+    const path = await calledPath("aHR0cHM6Ly9leGFtcGxlLmNvbS9mZWVkLnhtbA==");
+    expect(path).toBe("/api/1/shows/aHR0cHM6Ly9leGFtcGxlLmNvbS9mZWVkLnhtbA==");
+    expect(OP3_SHOWS_ROUTE.test(path)).toBe(true);
+  });
+
+  it("maps standard base64 '+' and '/' to the urlsafe alphabet", async () => {
+    // base64("https://example.com/?q=~~~>>>") contains '+' and '/'
+    const path = await calledPath("aHR0cHM6Ly9leGFtcGxlLmNvbS8/cT1+fn4+Pj4=");
+    expect(path).toBe("/api/1/shows/aHR0cHM6Ly9leGFtcGxlLmNvbS8_cT1-fn4-Pj4=");
+    expect(OP3_SHOWS_ROUTE.test(path)).toBe(true);
+  });
+
+  it("leaves show UUIDs, podcast:guids and unpadded base64url unchanged", async () => {
+    expect(await calledPath("0123456789abcdef0123456789abcdef")).toBe(
+      "/api/1/shows/0123456789abcdef0123456789abcdef",
+    );
+    expect(await calledPath("917393e3-1b1e-5cef-ace4-edaa54e1f810")).toBe(
+      "/api/1/shows/917393e3-1b1e-5cef-ace4-edaa54e1f810",
+    );
+    expect(await calledPath("aHR0cHM6Ly9leGFtcGxlLmNvbS9mZWVkLnhtbA")).toBe(
+      "/api/1/shows/aHR0cHM6Ly9leGFtcGxlLmNvbS9mZWVkLnhtbA",
+    );
+  });
+});
