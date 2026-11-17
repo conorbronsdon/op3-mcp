@@ -74,8 +74,15 @@ describe("tool annotations", () => {
       ...tools,
       { name: "op3_delete_show", annotations: { destructiveHint: true } },
       { name: "op3_unannotated" },
+      // Claims read-only but is destructive: only the destructiveHint
+      // clause of the filter catches this one.
+      { name: "op3_purge_cache", annotations: { readOnlyHint: true, destructiveHint: true } },
     ];
-    expect(notReadOnly(withWriter)).toEqual(["op3_delete_show", "op3_unannotated"]);
+    expect(notReadOnly(withWriter)).toEqual([
+      "op3_delete_show",
+      "op3_unannotated",
+      "op3_purge_cache",
+    ]);
   });
 
   it("listing tools makes no network calls", async () => {
