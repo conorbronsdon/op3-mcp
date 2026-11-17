@@ -36,11 +36,11 @@ export class OP3Client {
         url.searchParams.set(key, String(value));
       }
     }
-    // OP3 accepts the token as a query param or bearer header. We send both so
-    // the request works regardless of which the deployment prefers.
-    if (this.token) {
-      url.searchParams.set("token", this.token);
-    }
+    // The token travels only in the Authorization header. OP3 also accepts a
+    // `?token=` query param, but a secret in the URL ends up in proxy, CDN and
+    // server access logs. OP3 resolves the caller once for every /api/1 route
+    // and prefers the bearer header when present, so the header alone works
+    // for every endpoint this client calls.
 
     const endpoint = url.pathname;
     let response: Response;
