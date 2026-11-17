@@ -13,6 +13,17 @@ export function createServer(client: OP3Client): McpServer {
     version: "0.2.0",
   });
 
+  // Every tool only reads from the OP3 API. Declare that explicitly: the MCP
+  // spec defaults (readOnlyHint false, destructiveHint true) are the unsafe
+  // values, so omitting annotations tells clients these tools may write.
+  const readOnly = (title: string) => ({
+    title,
+    readOnlyHint: true,
+    destructiveHint: false,
+    idempotentHint: true,
+    openWorldHint: true,
+  });
+
   const showIdArg = z
     .string()
     .describe(
@@ -37,6 +48,7 @@ export function createServer(client: OP3Client): McpServer {
         .default(10)
         .describe("Max episodes to return when include_episodes is true (default 10)."),
     },
+    readOnly("Look up OP3 show"),
     async ({ identifier, include_episodes, episode_limit }) => {
       const show = await client.getShow(identifier, include_episodes);
       const out: Record<string, unknown> = {
@@ -61,6 +73,7 @@ export function createServer(client: OP3Client): McpServer {
     {
       show_uuid: z.string().describe("OP3 show UUID (32 hex chars)."),
     },
+    readOnly("Show download summary"),
     async ({ show_uuid }) => {
       const data = await client.getShowDownloadCounts(show_uuid);
       const counts = data.showDownloadCounts || {};
@@ -108,6 +121,7 @@ export function createServer(client: OP3Client): McpServer {
         .default("recent")
         .describe("Order results: recent (default), all-time downloads, or 7-day downloads."),
     },
+    readOnly("Episode download counts"),
     async ({ show_uuid, limit, sort_by }) => {
       const data = await client.getEpisodeDownloadCounts(show_uuid);
       let episodes = data.episodes || [];
@@ -144,6 +158,7 @@ export function createServer(client: OP3Client): McpServer {
         .default(10)
         .describe("Max apps to return, ranked by downloads (default 10)."),
     },
+    readOnly("Top listening apps"),
     async ({ show_uuid, limit }) => {
       const data = await client.getTopAppsForShow(show_uuid);
       const { ranked, total } = rankCounts(data.appDownloads || {}, Math.max(1, limit));
@@ -193,6 +208,7 @@ export function createServer(client: OP3Client): McpServer {
         .default(5000)
         .describe("How many download records to sample for the aggregation (default 5000, cap 20000). Higher is more accurate but slower."),
     },
+    readOnly("Top listener countries"),
     async ({ show_uuid, by, start, end, window_days, limit, max_records }) => {
       const cap = Math.min(Math.max(100, max_records ?? 5000), 20000);
       // OP3 returns records ascending by time. Without a start, a sample would
@@ -247,6 +263,7 @@ export function createServer(client: OP3Client): McpServer {
         .default(20)
         .describe("Max records to return (default 20, cap 200). Records are verbose; keep this small."),
     },
+    readOnly("Raw download records"),
     async ({ show_uuid, start, end, episode_id, limit }) => {
       const cappedLimit = Math.min(Math.max(1, limit), 200);
       const data = await client.getDownloads({
